@@ -1,4 +1,6 @@
-# NOTE: **A new operator based [Helm Chart](https://github.com/minio/operator/tree/master/helm/minio-operator) replaces this project. This repository will be archived after April 2021**
+# NOTE:
+# Recommended: **A new operator based [Helm Chart](https://github.com/minio/operator/tree/master/helm/minio-operator) replaces this project. This repository will be archived after April 2021**
+# **A vanilla helm chart is available here [Helm Chart Vanilla](https://github.com/minio/minio/tree/master/helm/minio) without the operator**.
 
 ```bash
 helm repo remove minio
@@ -7,36 +9,35 @@ helm install --namespace minio-operator --create-namespace --generate-name minio
 kubectl apply -f https://github.com/minio/operator/blob/master/examples/tenant.yaml
 ```
 
-# MinIO (legacy docs)
-=====
+or
 
+```bash
+helm repo remove minio
+helm repo add minio https://charts.min.io/
+helm install --namespace minio --set rootUser=rootuser,rootPassword=rootpass123 --generate-name minio/minio
+```
+
+# MinIO (legacy docs)
 [MinIO](https://min.io) is a High Performance Object Storage released under Apache License v2.0. It is API compatible with Amazon S3 cloud storage service. Use MinIO to build high performance infrastructure for machine learning, analytics and application data workloads.
 
 MinIO supports [distributed mode](https://docs.minio.io/docs/distributed-minio-quickstart-guide). In distributed mode, you can pool multiple drives (even on different machines) into a single object storage server.
 
 For more detailed documentation please visit [here](https://docs.minio.io/)
 
-Introduction
-------------
-
+## Introduction
 This chart bootstraps MinIO deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
-Prerequisites
--------------
-
+## Prerequisites
 - Kubernetes 1.4+ with Beta APIs enabled for default standalone mode.
 - Kubernetes 1.5+ with Beta APIs enabled to run MinIO in [distributed mode](#distributed-minio).
 - PV provisioner support in the underlying infrastructure.
 
-Configure MinIO Helm repo
---------------------
+## Configure MinIO Helm repo
 ```bash
 $ helm repo add minio https://helm.min.io/
 ```
 
-Installing the Chart
---------------------
-
+## Installing the Chart
 Install this chart using:
 
 ```bash
@@ -46,7 +47,6 @@ $ helm install --namespace minio --generate-name minio/minio
 The command deploys MinIO on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 ### Release name
-
 An instance of a chart running in a Kubernetes cluster is called a release. Each release is identified by a unique name within the cluster. Helm automatically assigns a unique release name after installing the chart. You can also set your preferred name by:
 
 ```bash
@@ -54,7 +54,6 @@ $ helm install my-release minio/minio
 ```
 
 ### Access and Secret keys
-
 By default a pre-generated access and secret key will be used. To override the default keys, pass the access and secret keys as arguments to helm install.
 
 ```bash
@@ -62,7 +61,6 @@ $ helm install --set accessKey=myaccesskey,secretKey=mysecretkey --generate-name
 ```
 
 ### Updating MinIO configuration via Helm
-
 [ConfigMap](https://kubernetes.io/docs/user-guide/configmap/) allows injecting containers with configuration data even while a Helm release is deployed.
 
 To update your MinIO server configuration while it is deployed in a release, you need to
@@ -74,7 +72,6 @@ To update your MinIO server configuration while it is deployed in a release, you
 You can also check the history of upgrades to a release using `helm history my-release`. Replace `my-release` with the actual release name.
 
 ### Installing certificates from third party CAs
-
 MinIO can connect to other servers, including MinIO nodes or other server types such as NATs and Redis. If these servers use certificates that were not registered with a known CA, add trust for these certificates to MinIO Server by bundling these certificates into a Kubernetes secret and providing it to Helm via the `trustedCertsSecret` value. If `.Values.tls.enabled` is `true` and you're installing certificates for third party CAs, remember to include Minio's own certificate with key `public.crt`, if it also needs to be trusted.
 
 For instance, given that TLS is enabled and you need to add trust for Minio's own CA and for the CA of a Keycloak server, a Kubernetes secret can be created from the certificate files using `kubectl`:
@@ -99,9 +96,7 @@ or
 --set trustedCertsSecret=minio-trusted-certs
 ```
 
-Uninstalling the Chart
-----------------------
-
+## Uninstalling the Chart
 Assuming your release is named as `my-release`, delete it using the command:
 
 ```bash
@@ -116,9 +111,7 @@ $ helm uninstall my-release
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
 
-Upgrading the Chart
--------------------
-
+## Upgrading the Chart
 You can use Helm to update MinIO version in a live release. Assuming your release is named as `my-release`, get the values using the command:
 
 ```bash
@@ -133,9 +126,7 @@ $ helm upgrade -f old_values.yaml my-release minio/minio
 
 Default upgrade strategies are specified in the `values.yaml` file. Update these fields if you'd like to use a different strategy.
 
-Configuration
--------------
-
+## Configuration
 The following table lists the configurable parameters of the MinIO chart and their default values.
 
 | Parameter                                        | Description                                                                                                                             | Default                          |
@@ -257,9 +248,7 @@ $ helm install --name my-release -f values.yaml minio/minio
 
 > **Tip**: You can use the default [values.yaml](minio/values.yaml)
 
-Distributed MinIO
------------
-
+## Distributed MinIO
 This chart provisions a MinIO server in standalone mode, by default. To provision MinIO server in [distributed mode](https://docs.minio.io/docs/distributed-minio-quickstart-guide), set the `mode` field to `distributed`,
 
 ```bash
@@ -280,13 +269,11 @@ You can also expand an existing deployment by adding new zones, following comman
 $ helm install --set mode=distributed,replicas=8,zones=2 minio/minio
 ```
 
-### StatefulSet [limitations](http://kubernetes.io/docs/concepts/abstractions/controllers/statefulsets/#limitations) applicable to distributed MinIO
-
+## StatefulSet [limitations](http://kubernetes.io/docs/concepts/abstractions/controllers/statefulsets/#limitations) applicable to distributed MinIO
 1. StatefulSets need persistent storage, so the `persistence.enabled` flag is ignored when `mode` is set to `distributed`.
 2. When uninstalling a distributed MinIO release, you'll need to manually delete volumes associated with the StatefulSet.
 
-NAS Gateway
------------
+## NAS Gateway
 
 ### Prerequisites
 
@@ -309,9 +296,7 @@ $ helm install --set nasgateway.enabled=true,nasgateway.replicas=8 minio/minio
 
 This provisions MinIO NAS gateway with 8 instances.
 
-Persistence
------------
-
+## Persistence
 This chart provisions a PersistentVolumeClaim and mounts corresponding persistent volume to default location `/export`. You'll need physical storage available in the Kubernetes cluster for this to work. If you'd rather use `emptyDir`, disable PersistentVolumeClaim by:
 
 ```bash
@@ -320,9 +305,7 @@ $ helm install --set persistence.enabled=false minio/minio
 
 > *"An emptyDir volume is first created when a Pod is assigned to a Node, and exists as long as that Pod is running on that node. When a Pod is removed from a node for any reason, the data in the emptyDir is deleted forever."*
 
-Existing PersistentVolumeClaim
-------------------------------
-
+## Existing PersistentVolumeClaim
 If a Persistent Volume Claim already exists, specify it during installation.
 
 1. Create the PersistentVolume
@@ -333,30 +316,19 @@ If a Persistent Volume Claim already exists, specify it during installation.
 $ helm install --set persistence.existingClaim=PVC_NAME minio/minio
 ```
 
-NetworkPolicy
--------------
+## NetworkPolicy
+To enable network policy for MinIO, install [a networking plugin that implements the Kubernetes NetworkPolicy spec](https://kubernetes.io/docs/tasks/administer-cluster/declare-network-policy#before-you-begin), and set `networkPolicy.enabled` to `true`.
 
-To enable network policy for MinIO,
-install [a networking plugin that implements the Kubernetes
-NetworkPolicy spec](https://kubernetes.io/docs/tasks/administer-cluster/declare-network-policy#before-you-begin),
-and set `networkPolicy.enabled` to `true`.
+For Kubernetes v1.5 & v1.6, you must also turn on NetworkPolicy by setting the DefaultDeny namespace annotation. Note: this will enforce policy for _all_ pods in the namespace:
 
-For Kubernetes v1.5 & v1.6, you must also turn on NetworkPolicy by setting
-the DefaultDeny namespace annotation. Note: this will enforce policy for _all_ pods in the namespace:
+```bash
+kubectl annotate namespace default "net.beta.kubernetes.io/network-policy={\"ingress\":{\"isolation\":\"DefaultDeny\"}}"
+```
 
-    kubectl annotate namespace default "net.beta.kubernetes.io/network-policy={\"ingress\":{\"isolation\":\"DefaultDeny\"}}"
+With NetworkPolicy enabled, traffic will be limited to just port 9000. For more precise policy, set `networkPolicy.allowExternal=true`. This will only allow pods with the generated client label to connect to MinIO. This label will be displayed in the output of a successful install.
 
-With NetworkPolicy enabled, traffic will be limited to just port 9000.
-
-For more precise policy, set `networkPolicy.allowExternal=true`. This will
-only allow pods with the generated client label to connect to MinIO.
-This label will be displayed in the output of a successful install.
-
-Existing secret
----------------
-
-Instead of having this chart create the secret for you, you can supply a preexisting secret, much
-like an existing PersistentVolumeClaim.
+## Existing secret
+Instead of having this chart create the secret for you, you can supply a preexisting secret, much like an existing PersistentVolumeClaim.
 
 First, create the secret:
 ```bash
@@ -382,9 +354,7 @@ The following fields are expected in the secret:
 
 All corresponding variables will be ignored in values file.
 
-Configure TLS
--------------
-
+## Configure TLS
 To enable TLS for MinIO containers, acquire TLS certificates from a CA or create self-signed certificates. While creating / acquiring certificates ensure the corresponding domain names are set as per the standard [DNS naming conventions](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-identity) in a Kubernetes StatefulSet (for a distributed MinIO setup). Then create a secret using
 
 ```bash
@@ -397,9 +367,7 @@ Then install the chart, specifying that you want to use the TLS secret:
 $ helm install --set tls.enabled=true,tls.certSecret=tls-ssl-minio minio/minio
 ```
 
-Pass environment variables to MinIO containers
-----------------------------------------------
-
+## Pass environment variables to MinIO containers
 To pass environment variables to MinIO containers when deploying via Helm chart, use the below command line format
 
 ```bash
@@ -408,9 +376,7 @@ $ helm install --set environment.MINIO_BROWSER=on,environment.MINIO_DOMAIN=domai
 
 You can add as many environment variables as required, using the above format. Just add `environment.<VARIABLE_NAME>=<value>` under `set` flag.
 
-Create buckets after install
----------------------------
-
+## Create buckets after install
 Install the chart, specifying the buckets you want to create after install:
 
 ```bash
