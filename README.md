@@ -14,7 +14,7 @@ or
 ```bash
 helm repo remove minio
 helm repo add minio https://charts.min.io/
-helm install --namespace minio --set rootUser=rootuser,rootPassword=rootpass123 --generate-name minio/minio
+helm install --namespace minio --create-namespace --set rootUser=rootuser,rootPassword=rootpass123 --generate-name minio/minio
 ```
 
 # MinIO (legacy docs)
